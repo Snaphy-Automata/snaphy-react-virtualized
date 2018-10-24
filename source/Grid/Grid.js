@@ -1107,7 +1107,8 @@ class Grid extends React.PureComponent<Props, State> {
       this._initialScrollLeft > 0 ? this._initialScrollLeft : state.scrollLeft;
 
     const isScrolling = this._isScrolling(props, state);
-
+    //Store old children list for caching purpose..
+    const oldChildrenList = this._childrenToDisplay;
     this._childrenToDisplay = [];
 
     // Render only enough columns and rows to cover the visible area of the grid.
@@ -1138,6 +1139,8 @@ class Grid extends React.PureComponent<Props, State> {
         },
       );
 
+      const oldVisibleStartIndex = this._renderedRowStartIndex;
+      const oldVisibleStopIndex = this._renderedRowStopIndex;
       // Store for _invokeOnGridRenderedHelper()
       this._renderedColumnStartIndex = visibleColumnIndices.start;
       this._renderedColumnStopIndex = visibleColumnIndices.stop;
@@ -1173,6 +1176,16 @@ class Grid extends React.PureComponent<Props, State> {
             ? visibleRowIndices.stop
             : -1,
       });
+
+      const oldOverScanStartRowIndex = this.overScanStartRowIndex;
+      const oldOverScanStopIndex = this.overScanStopRowIndex;
+
+      // console.log(`
+      // OldVisible Start:${oldVisibleStartIndex}, Stop: ${oldVisibleStopIndex}
+      // Old Overscan index: ${this.overScanStartRowIndex}, ${this.overScanStopRowIndex}
+      // New Start: ${this._renderedRowStartIndex},
+      // Stop: ${this._renderedRowStopIndex}
+      // oldChildrenList: ${oldChildrenList}`);
 
       // Store for _invokeOnGridRenderedHelper()
       let columnStartIndex = overscanColumnIndices.overscanStartIndex;
@@ -1219,6 +1232,10 @@ class Grid extends React.PureComponent<Props, State> {
         }
       }
 
+      //Store overscan row index..
+      this.overScanStartRowIndex = rowStartIndex;
+      this.overScanStopRowIndex = rowStopIndex;
+
       this._childrenToDisplay = cellRangeRenderer({
         cellCache: this._cellCache,
         cellRenderer,
@@ -1240,6 +1257,13 @@ class Grid extends React.PureComponent<Props, State> {
         verticalOffsetAdjustment,
         visibleColumnIndices,
         visibleRowIndices,
+
+        //24th Oct 2018
+        oldChildrenList,
+        oldVisibleStartIndex,
+        oldVisibleStopIndex,
+        oldOverScanStartRowIndex,
+        oldOverScanStopIndex,
       });
 
       // update the indices

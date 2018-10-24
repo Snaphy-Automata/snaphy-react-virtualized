@@ -25,8 +25,16 @@ export default function defaultCellRangeRenderer({
   verticalOffsetAdjustment,
   visibleColumnIndices,
   visibleRowIndices,
+
+  //24th Oct
+  oldChildrenList,
+  oldVisibleStartIndex,
+  oldVisibleStopIndex,
+  oldOverScanStartRowIndex,
+  oldOverScanStopIndex,
 }: CellRangeRendererParams) {
-  const renderedCells = [];
+  oldChildrenList = oldChildrenList || [];
+  const renderedCells = oldChildrenList;
 
   // Browsers have native size limits for elements (eg Chrome 33M pixels, IE 1.5M pixes).
   // User cannot scroll beyond these size limitations.
@@ -38,8 +46,12 @@ export default function defaultCellRangeRenderer({
     rowSizeAndPositionManager.areOffsetsAdjusted();
 
   const canCacheStyle = !isScrolling && !areOffsetsAdjusted;
-
-  for (let rowIndex = rowStartIndex; rowIndex <= rowStopIndex; rowIndex++) {
+  const startIndex =
+    oldOverScanStopIndex !== undefined ? oldOverScanStopIndex : rowStartIndex;
+  if (renderedCells.length > rowStopIndex) {
+    return renderedCells;
+  }
+  for (let rowIndex = startIndex; rowIndex <= rowStopIndex; rowIndex++) {
     let rowDatum = rowSizeAndPositionManager.getSizeAndPositionOfCell(rowIndex);
 
     for (
@@ -138,7 +150,7 @@ export default function defaultCellRangeRenderer({
         warnAboutMissingStyle(parent, renderedCell);
       }
 
-      renderedCells.push(renderedCell);
+      renderedCells[rowIndex] = renderedCell;
     }
   }
 
