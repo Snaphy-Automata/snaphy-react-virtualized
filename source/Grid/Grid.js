@@ -1108,7 +1108,7 @@ class Grid extends React.PureComponent<Props, State> {
 
     const isScrolling = this._isScrolling(props, state);
     //Store old children list for caching purpose..
-    const oldChildrenList = this._childrenToDisplay;
+    const oldChildrenList = this._childrenToDisplayOri || [];
     this._childrenToDisplay = [];
 
     // Render only enough columns and rows to cover the visible area of the grid.
@@ -1271,6 +1271,13 @@ class Grid extends React.PureComponent<Props, State> {
       this._columnStopIndex = columnStopIndex;
       this._rowStartIndex = rowStartIndex;
       this._rowStopIndex = rowStopIndex;
+
+      this._childrenToDisplayOri = [...this._childrenToDisplay];
+      this._childrenToDisplay = this._childrenToDisplay.splice(
+        rowStartIndex,
+        rowStopIndex,
+      );
+      //console.log("Adding row", rowStartIndex, this._childrenToDisplay, this._childrenToDisplayOri)
     }
   }
 
